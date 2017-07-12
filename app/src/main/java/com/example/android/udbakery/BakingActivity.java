@@ -8,12 +8,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.example.android.udbakery.Model.BakeryModel;
+import com.example.android.udbakery.Model.BMBakeryModel;
 
 import java.util.ArrayList;
 
@@ -21,7 +20,7 @@ public class BakingActivity extends AppCompatActivity {
 
     private static final String TAG = BakingActivity.class.getSimpleName();
 
-    public ArrayList<BakeryModel> mBakeryModelList;
+    public ArrayList<BMBakeryModel> mBakeryModelList;
 
     public RecyclerView mRecyclerView;
     public LinearLayoutManager mLinearLayoutManager;
@@ -48,7 +47,8 @@ public class BakingActivity extends AppCompatActivity {
             mRecyclerView.setAdapter(mBakeryAdapter);
 
             FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+
+            fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
@@ -59,28 +59,30 @@ public class BakingActivity extends AppCompatActivity {
         new FetchBakesAsyncTask().execute();
     }
 
-    public class FetchBakesAsyncTask extends AsyncTask<Void, Void, ArrayList<BakeryModel>>
+    public class FetchBakesAsyncTask extends AsyncTask<Void, Void, Void>
     {
 
         @Override
-        protected ArrayList<BakeryModel> doInBackground(Void... voids) {
+        protected Void doInBackground(Void... voids) {
             try {
-               return new NetworkUtils().fetchItems();
+
+                new NetworkUtils().start();
             } catch(Exception e)
             {
                 e.printStackTrace();
-                return  null;
+
             }
+            return null;
         }
 
-        @Override
-        protected void onPostExecute(ArrayList<BakeryModel> bakeryModelArrayList) {
-            super.onPostExecute(bakeryModelArrayList);
-
-            mBakeryModelList = bakeryModelArrayList; 
-            Log.i(TAG, mBakeryModelList.size()+"");
-            mBakeryAdapter.setBakeryData(mBakeryModelList);
-        }
+//        @Override
+//        protected void onPostExecute(ArrayList<BakeryModel> bakeryModelArrayList) {
+//            super.onPostExecute(bakeryModelArrayList);
+//
+//            mBakeryModelList = bakeryModelArrayList;
+//            Log.i(TAG, mBakeryModelList.size()+"");
+//            mBakeryAdapter.setBakeryData(mBakeryModelList);
+//        }
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

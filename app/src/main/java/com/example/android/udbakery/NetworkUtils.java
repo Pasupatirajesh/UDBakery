@@ -1,125 +1,72 @@
 package com.example.android.udbakery;
 
-import android.net.Uri;
 import android.util.Log;
 
-import com.example.android.udbakery.Model.BakeryModel;
+import com.example.android.udbakery.Model.BMBakeryModel;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Scanner;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.http.GET;
 
 /**
  * Created by SSubra27 on 7/6/17.
  */
 
-public class NetworkUtils  {
+public class NetworkUtils implements Callback<BMBakeryModel> {
 
 
-    private static final String API_URL = "https://d17h27t6h515a5.cloudfront.net/topher/2017/May/59121517_baking/baking.json";
+    private static final String API_URL = "https://d17h27t6h515a5.cloudfront.net";
     private static final String TAG = NetworkUtils.class.getSimpleName() ;
 
     public NetworkUtils()
     {
 
     }
-
-    // Build the URL
-
-    public static URL buildUrl()
+    public void start()
     {
-        Uri endpointUri ;
-        endpointUri = Uri.parse(API_URL).buildUpon()
-                .appendQueryParameter("method", "get")
-                .appendQueryParameter("format", "json")
-                .appendQueryParameter("nojsoncallback", "1")
-                .build();
+        Gson gson = new GsonBuilder().setLenient().create();
 
-        URL url = null;
+        Retrofit retrofit = new Retrofit.Builder()
+                            .baseUrl(API_URL)
+                            .addConverterFactory(GsonConverterFactory.create(gson))
+                            .build();
 
-        try
-        {
-            url = new URL(endpointUri.toString());
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
+        BakeryService.BakeryItemAPI bakeryItemAPI = retrofit.create(BakeryService.BakeryItemAPI.class);
 
-        return url;
+        Call<BMBakeryModel> call = bakeryItemAPI.loadIngredients();
+        call.enqueue(this);
     }
 
-    // Get response from the server
+//    https://d17h27t6h515a5.cloudfront.net/topher/2017/May/59121517_baking/baking.json
 
-    public static String getResponseFromHttpUrl(URL queryUrl) throws IOException
-    {
-        HttpURLConnection connection = (HttpURLConnection) queryUrl.openConnection();
+    @Override
+    public void onResponse(Call<BMBakeryModel> call, Response<BMBakeryModel> response) {
+    if (response.isSuccessful()) {
 
-        try
-        {
-            InputStream in = connection.getInputStream();
+        Log.i(TAG, String.valueOf(response.body()));
+    } else {
+        System.out.println(response.errorBody());
+    }
+}
 
-            Scanner sc = new Scanner(in);
 
-            sc.useDelimiter("//A");
+    @Override
+    public void onFailure(Call<BMBakeryModel> call, Throwable t) {
 
-            boolean hasInput = sc.hasNext();
-
-            if(hasInput)
-            {
-                return sc.next();
-            } else
-            {
-                return null;
-            }
-        } finally {
-            connection.disconnect();
-        }
     }
 
-    public ArrayList<BakeryModel> fetchItems() throws JSONException, IOException
+    public static class BakeryService
     {
-        ArrayList<BakeryModel> arrayList = new ArrayList<>();
-
-        URL url = buildUrl();
-        String responseStringJson =  getResponseFromHttpUrl(url);
-
-        Log.i(TAG, responseStringJson);
-
-        JSONArray jsonArray = new JSONArray(responseStringJson);
-
-        for(int i=0; i<jsonArray.length(); i++)
+        public interface BakeryItemAPI
         {
-            JSONObject jsonObject = jsonArray.getJSONObject(i);
-            parseItems(arrayList, jsonObject);
-            Log.i("jsonResponse", jsonObject+"" );
+            @GET("/topher/2017/May/59121517_baking/baking.json")
+            Call<BMBakeryModel> loadIngredients();
+
         }
-        return arrayList;
-    }
-
-    private void parseItems(ArrayList<BakeryModel> arrayList, JSONObject jsonObject) throws JSONException {
-
-        JSONArray jsonArray = jsonObject.getJSONArray("ingredients");
-
-        for(int i=0 ; i <jsonArray.length(); i++)
-        {
-
-            JSONObject bakeryItemObject = jsonArray.getJSONObject((i));
-
-            BakeryModel bakeryModel = new BakeryModel();
-
-            bakeryModel.mRecipeName = bakeryItemObject.getString("ingredient");
-
-            arrayList.add(bakeryModel);
-
-            Log.i(TAG, bakeryModel.mRecipeName);
-        }
-
     }
 }
