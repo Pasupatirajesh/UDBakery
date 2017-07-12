@@ -12,15 +12,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.example.android.udbakery.Model.BMBakeryModel;
+import com.example.android.udbakery.Model.BakeryModel;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class BakingActivity extends AppCompatActivity {
 
     private static final String TAG = BakingActivity.class.getSimpleName();
 
-    public ArrayList<BMBakeryModel> mBakeryModelList;
+    public List<BakeryModel.Bakery> mBakeryModelList;
 
     public RecyclerView mRecyclerView;
     public LinearLayoutManager mLinearLayoutManager;
@@ -59,11 +60,11 @@ public class BakingActivity extends AppCompatActivity {
         new FetchBakesAsyncTask().execute();
     }
 
-    public class FetchBakesAsyncTask extends AsyncTask<Void, Void, Void>
+    public class FetchBakesAsyncTask extends AsyncTask<Void, Void, List<BakeryModel.Bakery>>
     {
 
         @Override
-        protected Void doInBackground(Void... voids) {
+        protected List<BakeryModel.Bakery> doInBackground(Void... voids) {
             try {
 
                 new NetworkUtils().start();
@@ -75,14 +76,14 @@ public class BakingActivity extends AppCompatActivity {
             return null;
         }
 
-//        @Override
-//        protected void onPostExecute(ArrayList<BakeryModel> bakeryModelArrayList) {
-//            super.onPostExecute(bakeryModelArrayList);
-//
-//            mBakeryModelList = bakeryModelArrayList;
+        @Override
+        protected void onPostExecute(List<BakeryModel.Bakery> bakeryModelArrayList) {
+            super.onPostExecute(bakeryModelArrayList);
+
+            mBakeryModelList = bakeryModelArrayList;
 //            Log.i(TAG, mBakeryModelList.size()+"");
-//            mBakeryAdapter.setBakeryData(mBakeryModelList);
-//        }
+            mBakeryAdapter.setBakeryData(mBakeryModelList);
+        }
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

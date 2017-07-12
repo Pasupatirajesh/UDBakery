@@ -7,9 +7,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import com.example.android.udbakery.Model.BMBakeryModel;
+import com.example.android.udbakery.Model.BakeryModel;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by SSubra27 on 7/7/17.
@@ -18,9 +18,9 @@ import java.util.ArrayList;
 public class BakeryAdapter extends RecyclerView.Adapter<BakeryAdapter.ViewHolder> {
 
     private Context mContext;
-    private static ArrayList<BMBakeryModel> mBakeryItemData;
+    private static List<BakeryModel.Bakery> mBakeryItemData;
 
-    public BakeryAdapter(Context ct, ArrayList<BMBakeryModel> bm)
+    public BakeryAdapter(Context ct, List<BakeryModel.Bakery> bm)
     {
         mContext = ct;
         mBakeryItemData = bm;
@@ -37,17 +37,18 @@ public class BakeryAdapter extends RecyclerView.Adapter<BakeryAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        BMBakeryModel bakeryModel = mBakeryItemData.get(position);
+        BakeryModel.Bakery bakeryModel = mBakeryItemData.get(position);
 
-//        String recipeName = bakeryModel.getRecipeName();
+        String recipeName = bakeryModel.getRecipeName();
 
-//        holder.mRecipeButton.setText(recipeName);
+        holder.mRecipeButton.setText(recipeName);
 
     }
 
     @Override
     public int getItemCount() {
         return mBakeryItemData.size();
+
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder
@@ -61,7 +62,7 @@ public class BakeryAdapter extends RecyclerView.Adapter<BakeryAdapter.ViewHolder
         }
     }
 
-    public void setBakeryData(ArrayList<BMBakeryModel> bakeryData)
+    public void setBakeryData(List<BakeryModel.Bakery> bakeryData)
     {
         mBakeryItemData = bakeryData;
         notifyDataSetChanged();

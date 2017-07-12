@@ -1,26 +1,24 @@
 package com.example.android.udbakery.Model;
 
-import java.util.ArrayList;
-
 /**
  * Created by SSubra27 on 7/3/17.
  */
 
-public class BMBakeryModel  {
+public class BakeryModel  {
 
     private static final String TAG = BakeryModel.class.getSimpleName();
 
-    public static ArrayList<BakeryModel> mItems;
+//    public static List<Bakery> mItems;
+//
+//    public static List<Bakery> getItems() {
+//        return mItems;
+//    }
 
-    public static ArrayList<BakeryModel> getmItems() {
-        return mItems;
-    }
+//    public static void setItems(List<Bakery> mItems) {
+//        BakeryModel.mItems = mItems;
+//    }
 
-    public static void setmItems(ArrayList<BakeryModel> mItems) {
-        BMBakeryModel.mItems = mItems;
-    }
-
-    public static class BakeryModel
+    public static class Bakery
 
     {
         String id;
