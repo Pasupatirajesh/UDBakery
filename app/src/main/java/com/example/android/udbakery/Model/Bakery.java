@@ -4,21 +4,7 @@ package com.example.android.udbakery.Model;
  * Created by SSubra27 on 7/3/17.
  */
 
-public class BakeryModel  {
-
-    private static final String TAG = BakeryModel.class.getSimpleName();
-
-//    public static List<Bakery> mItems;
-//
-//    public static List<Bakery> getItems() {
-//        return mItems;
-//    }
-
-//    public static void setItems(List<Bakery> mItems) {
-//        BakeryModel.mItems = mItems;
-//    }
-
-    public static class Bakery
+public class Bakery
 
     {
         String id;
@@ -68,4 +54,4 @@ public class BakeryModel  {
     }
 }
 
-}
+

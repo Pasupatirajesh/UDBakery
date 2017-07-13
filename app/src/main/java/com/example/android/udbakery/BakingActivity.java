@@ -1,6 +1,5 @@
 package com.example.android.udbakery;
 
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -11,17 +10,27 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
-import com.example.android.udbakery.Model.BakeryModel;
+import com.example.android.udbakery.Model.Bakery;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
 public class BakingActivity extends AppCompatActivity {
 
     private static final String TAG = BakingActivity.class.getSimpleName();
+    private static final String API_URL = "https://d17h27t6h515a5.cloudfront.net/";
 
-    public List<BakeryModel.Bakery> mBakeryModelList;
+    public List<Bakery> mBakeryModelList;
 
     public RecyclerView mRecyclerView;
     public LinearLayoutManager mLinearLayoutManager;
@@ -39,14 +48,40 @@ public class BakingActivity extends AppCompatActivity {
 
             mRecyclerView = (RecyclerView)findViewById(R.id.rv_recipe_card_layout);
 
-            mLinearLayoutManager = new LinearLayoutManager(this);
 
             mRecyclerView.setLayoutManager(mLinearLayoutManager);
 
-            mBakeryAdapter = new BakeryAdapter(this, mBakeryModelList);
+            Gson gson = new GsonBuilder().setLenient().create();
 
-            mRecyclerView.setAdapter(mBakeryAdapter);
 
+            Retrofit retrofit = new Retrofit.Builder()
+                                    .baseUrl(API_URL)
+                                    .addConverterFactory(GsonConverterFactory.create(gson))
+                                    .build();
+
+            BakeryItemAPI bakeryItemAPI = retrofit.create(BakeryItemAPI.class);
+
+            Call<List<Bakery>> call = bakeryItemAPI.loadIngredients();
+
+            call.enqueue(new Callback<List<Bakery>>() {
+                @Override
+                public void onResponse(Call<List<Bakery>> call, Response<List<Bakery>> response) {
+                    mBakeryModelList = response.body();
+
+                    mBakeryAdapter = new BakeryAdapter(getApplicationContext(), (ArrayList<Bakery>) mBakeryModelList);
+
+                    mLinearLayoutManager = new LinearLayoutManager(getApplicationContext());
+
+                    mRecyclerView.setAdapter(mBakeryAdapter);
+
+                }
+
+                @Override
+                public void onFailure(Call<List<Bakery>> call, Throwable t) {
+                    t.printStackTrace();
+                    Toast.makeText(getApplicationContext(), "Not working", Toast.LENGTH_SHORT).show();
+                }
+            });
             FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 
             fab.setOnClickListener(new View.OnClickListener() {
@@ -57,34 +92,8 @@ public class BakingActivity extends AppCompatActivity {
             }
         });
 
-        new FetchBakesAsyncTask().execute();
-    }
-
-    public class FetchBakesAsyncTask extends AsyncTask<Void, Void, List<BakeryModel.Bakery>>
-    {
-
-        @Override
-        protected List<BakeryModel.Bakery> doInBackground(Void... voids) {
-            try {
-
-                new NetworkUtils().start();
-            } catch(Exception e)
-            {
-                e.printStackTrace();
-
-            }
-            return null;
         }
 
-        @Override
-        protected void onPostExecute(List<BakeryModel.Bakery> bakeryModelArrayList) {
-            super.onPostExecute(bakeryModelArrayList);
-
-            mBakeryModelList = bakeryModelArrayList;
-//            Log.i(TAG, mBakeryModelList.size()+"");
-            mBakeryAdapter.setBakeryData(mBakeryModelList);
-        }
-    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
