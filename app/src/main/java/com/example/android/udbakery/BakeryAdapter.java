@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import com.example.android.udbakery.Model.Bakery;
+import com.example.android.udbakery.Model.BakeryPojo;
 
 import java.util.ArrayList;
 
@@ -18,9 +18,9 @@ import java.util.ArrayList;
 public class BakeryAdapter extends RecyclerView.Adapter<BakeryAdapter.ViewHolder> {
 
     private Context mContext;
-    private static ArrayList<Bakery> mBakeryItemData;
+    private static ArrayList<BakeryPojo> mBakeryItemData;
 
-    public BakeryAdapter(Context ct, ArrayList<Bakery> bm)
+    public BakeryAdapter(Context ct, ArrayList<BakeryPojo> bm)
     {
         mContext = ct;
         mBakeryItemData = bm;
@@ -37,10 +37,10 @@ public class BakeryAdapter extends RecyclerView.Adapter<BakeryAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-         Bakery bakeryModel = mBakeryItemData.get(position);
+         BakeryPojo bakeryModel = mBakeryItemData.get(position);
 
-        String recipeName = bakeryModel.getRecipeName();
-
+        String recipeName = bakeryModel.getName();
+//
         holder.mRecipeButton.setText(recipeName);
 
     }
@@ -62,7 +62,7 @@ public class BakeryAdapter extends RecyclerView.Adapter<BakeryAdapter.ViewHolder
         }
     }
 
-    public void setBakeryData(ArrayList<Bakery> bakeryData)
+    public void setBakeryData(ArrayList<BakeryPojo> bakeryData)
     {
         mBakeryItemData = bakeryData;
         notifyDataSetChanged();

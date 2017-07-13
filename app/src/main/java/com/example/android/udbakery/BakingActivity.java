@@ -7,12 +7,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.example.android.udbakery.Model.Bakery;
+import com.example.android.udbakery.Model.BakeryPojo;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -30,7 +31,7 @@ public class BakingActivity extends AppCompatActivity {
     private static final String TAG = BakingActivity.class.getSimpleName();
     private static final String API_URL = "https://d17h27t6h515a5.cloudfront.net/";
 
-    public List<Bakery> mBakeryModelList;
+    public List<BakeryPojo> mBakeryModelList;
 
     public RecyclerView mRecyclerView;
     public LinearLayoutManager mLinearLayoutManager;
@@ -48,6 +49,10 @@ public class BakingActivity extends AppCompatActivity {
 
             mRecyclerView = (RecyclerView)findViewById(R.id.rv_recipe_card_layout);
 
+            mBakeryAdapter = new BakeryAdapter(getApplicationContext(), (ArrayList<BakeryPojo>) mBakeryModelList);
+            mLinearLayoutManager = new LinearLayoutManager(getApplicationContext());
+
+            mRecyclerView.setAdapter(mBakeryAdapter);
 
             mRecyclerView.setLayoutManager(mLinearLayoutManager);
 
@@ -61,23 +66,19 @@ public class BakingActivity extends AppCompatActivity {
 
             BakeryItemAPI bakeryItemAPI = retrofit.create(BakeryItemAPI.class);
 
-            Call<List<Bakery>> call = bakeryItemAPI.loadIngredients();
+            Call<List<BakeryPojo>> call = bakeryItemAPI.loadIngredients();
 
-            call.enqueue(new Callback<List<Bakery>>() {
+            call.enqueue(new Callback<List<BakeryPojo>>() {
                 @Override
-                public void onResponse(Call<List<Bakery>> call, Response<List<Bakery>> response) {
+                public void onResponse(Call<List<BakeryPojo>> call, Response<List<BakeryPojo>> response) {
+
+                    Log.i(TAG, response.body()+"");
                     mBakeryModelList = response.body();
-
-                    mBakeryAdapter = new BakeryAdapter(getApplicationContext(), (ArrayList<Bakery>) mBakeryModelList);
-
-                    mLinearLayoutManager = new LinearLayoutManager(getApplicationContext());
-
-                    mRecyclerView.setAdapter(mBakeryAdapter);
-
+                    mBakeryAdapter.setBakeryData((ArrayList<BakeryPojo>) mBakeryModelList);
                 }
 
                 @Override
-                public void onFailure(Call<List<Bakery>> call, Throwable t) {
+                public void onFailure(Call<List<BakeryPojo>> call, Throwable t) {
                     t.printStackTrace();
                     Toast.makeText(getApplicationContext(), "Not working", Toast.LENGTH_SHORT).show();
                 }
@@ -91,6 +92,7 @@ public class BakingActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+
 
         }
 
