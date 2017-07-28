@@ -93,7 +93,7 @@ public class BakingVideosActivity extends AppCompatActivity implements ExoPlayer
             mExoPlayer.addListener(this);
 
             // Prepare the media source
-            String userAgent = Util.getUserAgent(this, "ClassicMusicQuiz");
+            String userAgent = Util.getUserAgent(this, "BakeryVideos");
             MediaSource mediaSource = new ExtractorMediaSource(mediaUri, new DefaultDataSourceFactory(
                     this, userAgent), new DefaultExtractorsFactory(), null, null);
             mExoPlayer.prepare(mediaSource);
