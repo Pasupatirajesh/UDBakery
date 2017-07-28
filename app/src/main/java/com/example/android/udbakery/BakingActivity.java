@@ -1,6 +1,9 @@
 package com.example.android.udbakery;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -17,6 +20,8 @@ import com.example.android.udbakery.Model.BakeryPojo;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import org.parceler.Parcels;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +31,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class BakingActivity extends AppCompatActivity {
+public class BakingActivity extends AppCompatActivity implements BakeryAdapter.onItemClickedInterface{
 
     private static final String TAG = BakingActivity.class.getSimpleName();
     private static final String API_URL = "https://d17h27t6h515a5.cloudfront.net/";
@@ -36,6 +41,10 @@ public class BakingActivity extends AppCompatActivity {
     public RecyclerView mRecyclerView;
     public LinearLayoutManager mLinearLayoutManager;
     public BakeryAdapter mBakeryAdapter;
+
+    public static Parcelable mWrapper;
+
+    public static BakeryPojo mBakery;
 
 
         @Override
@@ -49,7 +58,8 @@ public class BakingActivity extends AppCompatActivity {
 
             mRecyclerView = (RecyclerView)findViewById(R.id.rv_recipe_card_layout);
 
-            mBakeryAdapter = new BakeryAdapter(getApplicationContext(), (ArrayList<BakeryPojo>) mBakeryModelList);
+            mBakeryAdapter = new BakeryAdapter(getApplicationContext(), (ArrayList<BakeryPojo>) mBakeryModelList, this);
+
             mLinearLayoutManager = new LinearLayoutManager(getApplicationContext());
 
             mRecyclerView.setAdapter(mBakeryAdapter);
@@ -60,9 +70,9 @@ public class BakingActivity extends AppCompatActivity {
 
 
             Retrofit retrofit = new Retrofit.Builder()
-                                    .baseUrl(API_URL)
-                                    .addConverterFactory(GsonConverterFactory.create(gson))
-                                    .build();
+                    .baseUrl(API_URL)
+                    .addConverterFactory(GsonConverterFactory.create(gson))
+                    .build();
 
             BakeryItemAPI bakeryItemAPI = retrofit.create(BakeryItemAPI.class);
 
@@ -86,13 +96,12 @@ public class BakingActivity extends AppCompatActivity {
             FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 
             fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
+                @Override
+                public void onClick(View view) {
+                    Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                }
+            });
 
         }
 
@@ -116,5 +125,16 @@ public class BakingActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onItemClicked(int clickedListItem) {
+        Toast.makeText(this, "I was clicked", Toast.LENGTH_SHORT).show();
+        Context context = this;
+        Intent myIntent = new Intent(context, BakingDetailActivity.class);
+        mBakery = mBakeryModelList.get(clickedListItem);
+        mWrapper = Parcels.wrap(mBakery);
+        myIntent.putExtra("BakeryDataArrayList", mWrapper);
+        startActivity(myIntent);
     }
 }

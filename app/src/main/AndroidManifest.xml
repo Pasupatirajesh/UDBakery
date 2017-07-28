@@ -21,6 +21,13 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <activity
+            android:name=".BakingDetailActivity"
+            android:label="@string/title_activity_baking_detail"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity android:name=".BakingVideosActivity">
+        </activity>
     </application>
 
 </manifest>

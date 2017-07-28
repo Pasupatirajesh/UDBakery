@@ -1,13 +1,13 @@
 package com.example.android.udbakery.Model;
 
-
-
-
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import org.parceler.Parcel;
+
 import java.util.List;
 
+@Parcel (Parcel.Serialization.BEAN)
 public class BakeryPojo {
 
     @SerializedName("id")
@@ -19,6 +19,9 @@ public class BakeryPojo {
     @SerializedName("ingredients")
     @Expose
     private List<Ingredient> ingredients = null;
+    @SerializedName("steps")
+    @Expose
+    private List<Steps> steps = null;
 
     public Integer getId() {
         return id;
@@ -45,7 +48,16 @@ public class BakeryPojo {
     }
 
 
-    public class Ingredient {
+    public List<Steps> getSteps() {
+        return steps;
+    }
+
+    public void setSteps(List<Steps> steps) {
+        this.steps = steps;
+    }
+
+    @Parcel (Parcel.Serialization.BEAN)
+    public static class Ingredient {
 
         @SerializedName("quantity")
         @Expose
@@ -79,6 +91,67 @@ public class BakeryPojo {
 
         public void setIngredient(String ingredient) {
             this.ingredient = ingredient;
+        }
+
+    }
+
+    @Parcel
+    public static class Steps
+    {
+        @SerializedName("id")
+        @Expose
+        private Integer id;
+        @SerializedName("shortDescription")
+        @Expose
+        private String shortDescription;
+        @SerializedName("description")
+        @Expose
+        private String description;
+        @SerializedName("videoURL")
+        @Expose
+        private String videoURL;
+        @SerializedName("thumbnailURL")
+        @Expose
+        private String thumbnailURL;
+
+        public Integer getId() {
+            return id;
+        }
+
+        public void setId(Integer id) {
+            this.id = id;
+        }
+
+        public String getShortDescription() {
+            return shortDescription;
+        }
+
+        public void setShortDescription(String shortDescription) {
+            this.shortDescription = shortDescription;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public void setDescription(String description) {
+            this.description = description;
+        }
+
+        public String getVideoURL() {
+            return videoURL;
+        }
+
+        public void setVideoURL(String videoURL) {
+            this.videoURL = videoURL;
+        }
+
+        public String getThumbnailURL() {
+            return thumbnailURL;
+        }
+
+        public void setThumbnailURL(String thumbnailURL) {
+            this.thumbnailURL = thumbnailURL;
         }
 
     }
