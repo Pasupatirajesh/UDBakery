@@ -24,9 +24,11 @@
         <activity
             android:name=".BakingDetailActivity"
             android:label="@string/title_activity_baking_detail"
+            android:parentActivityName=".BakingActivity"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
-        <activity android:name=".BakingVideosActivity">
+        <activity android:name=".BakingVideosActivity"
+                  android:parentActivityName=".BakingDetailActivity">
         </activity>
     </application>
 

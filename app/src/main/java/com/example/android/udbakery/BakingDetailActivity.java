@@ -1,6 +1,7 @@
 package com.example.android.udbakery;
 
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,7 +15,8 @@ import org.parceler.Parcels;
 public class BakingDetailActivity extends AppCompatActivity {
 
 
-    private BakeryPojo mBakeryPojo;
+    private static final String TAG = BakingDetailActivity.class.getSimpleName() ;
+    public static BakeryPojo mBakeryPojo;
     private RecyclerView mRecyclerView;
     private LinearLayoutManager mLinearLayoutManager;
     private TextView mIngredientsTextView;
@@ -25,6 +27,11 @@ public class BakingDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_baking_detail);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        ActionBar ab = getSupportActionBar();
+
+        ab.setDisplayHomeAsUpEnabled(true);
+
         Bundle myIntent = getIntent().getExtras();
 
         if (myIntent != null) {
@@ -50,6 +57,16 @@ public class BakingDetailActivity extends AppCompatActivity {
 
                 mRecyclerView.setAdapter(new BakeryStepAdapter(this, mBakeryPojo));
 
+//                mRecyclerView.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View view) {
+//                        Intent intent = new Intent(getBaseContext(),BakingVideosActivity.class);
+//                        Parcelable mWrapper = Parcels.wrap(mBakeryPojo);
+//                        Log.i(TAG, mBakeryPojo.getSteps().get(0).getVideoURL());
+//                        intent.putExtra("BakeryPojoObject", mWrapper);
+//
+//                    }
+//                });
             }
         }
 

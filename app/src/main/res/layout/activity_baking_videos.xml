@@ -5,34 +5,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.android.udbakery.BakingVideosActivity">
+    android:id="@+id/fragment_container"
+    tools:context="com.example.android.udbakery.BakingVideosActivity"
+    tools:layout_editor_absoluteY="81dp"
+    tools:layout_editor_absoluteX="0dp">
 
-
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="314dp"
-        android:layout_height="159dp"
-        android:text="TextView"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginBottom="112dp"
-        android:layout_marginLeft="1dp"
-        app:layout_constraintLeft_toLeftOf="@+id/vv_simple"
-        android:layout_marginRight="8dp"
-        app:layout_constraintRight_toRightOf="@+id/vv_simple"
-        tools:layout_editor_absoluteY="240dp"/>
-
-    <com.google.android.exoplayer2.ui.SimpleExoPlayerView
-        android:id="@+id/vv_simple"
-        android:layout_width="315dp"
-        android:layout_height="212dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/textView"
-        app:layout_constraintHorizontal_bias="0.509"
+    <fragment
+        android:id="@+id/fragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="3dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.05"/>
+        android:name="com.example.android.udbakery.BakeryVideoFragment">
+    </fragment>
+
+
 </android.support.constraint.ConstraintLayout>

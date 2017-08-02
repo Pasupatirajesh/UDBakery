@@ -25,6 +25,7 @@ public class BakeryStepAdapter extends RecyclerView.Adapter<BakeryStepAdapter.Vi
     private BakeryPojo mBakeryPojo;
     private Parcelable mWrapper;
     private Parcelable mBakingWrapper;
+    private Parcelable mIdWrapper;
     public  BakeryStepAdapter(Context ct, BakeryPojo bakeryPojo)
     {
         this.mContext = ct;
@@ -72,10 +73,13 @@ public class BakeryStepAdapter extends RecyclerView.Adapter<BakeryStepAdapter.Vi
 
             mBakingWrapper = Parcels.wrap(mBakeryPojo.getSteps().get(getAdapterPosition()).getDescription());
 
+            mIdWrapper = Parcels.wrap(mBakeryPojo);
+
             Log.i(TAG, getAdapterPosition()+"");
 
             intent.putExtra("BakingPojo", mWrapper);
             intent.putExtra("BakingDescPojo", mBakingWrapper);
+            intent.putExtra("BakingIdPojo", mIdWrapper);
 
             mContext.startActivity(intent);
         }
