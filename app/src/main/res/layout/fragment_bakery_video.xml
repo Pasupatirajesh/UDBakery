@@ -44,13 +44,13 @@
         android:textSize="16sp"
         android:textAlignment="center"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="162dp"
         android:layout_marginLeft="1dp"
         app:layout_constraintLeft_toLeftOf="@+id/vv_simple"
         android:layout_marginRight="8dp"
         app:layout_constraintRight_toRightOf="@+id/vv_simple"
-        app:layout_constraintHorizontal_bias="0.62"
-        tools:layout_editor_absoluteY="248dp"/>
+        app:layout_constraintHorizontal_bias="0.612"
+        />
 
         <Button
             android:id="@+id/prev_button"

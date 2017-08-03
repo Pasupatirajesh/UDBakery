@@ -69,7 +69,8 @@ public class BakeryStepAdapter extends RecyclerView.Adapter<BakeryStepAdapter.Vi
         public void onClick(View view) {
             Intent intent =new Intent(mContext, BakingVideosActivity.class);
 
-            mWrapper = Parcels.wrap(mBakeryPojo.getSteps().get(getAdapterPosition()).getVideoURL());
+            mWrapper = Parcels.wrap(mBakeryPojo);
+
 
             mBakingWrapper = Parcels.wrap(mBakeryPojo.getSteps().get(getAdapterPosition()).getDescription());
 
@@ -80,6 +81,7 @@ public class BakeryStepAdapter extends RecyclerView.Adapter<BakeryStepAdapter.Vi
             intent.putExtra("BakingPojo", mWrapper);
             intent.putExtra("BakingDescPojo", mBakingWrapper);
             intent.putExtra("BakingIdPojo", mIdWrapper);
+            intent.putExtra("BakingPosId", getAdapterPosition());
 
             mContext.startActivity(intent);
         }

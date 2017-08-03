@@ -38,6 +38,7 @@ public class BakingDetailActivity extends AppCompatActivity {
             if (myIntent.getParcelable("BakeryDataArrayList") != null) {
                 mBakeryPojo = Parcels.unwrap(myIntent.getParcelable("BakeryDataArrayList"));
 
+                ab.setTitle((mBakeryPojo.getName() + " "));
                 mIngredientsTextView = (TextView) findViewById(R.id.tv_1);
 
                 mIngredientsTextView.setText(mBakeryPojo.getIngredients().get(0).getIngredient()
@@ -56,21 +57,8 @@ public class BakingDetailActivity extends AppCompatActivity {
                 mRecyclerView.setLayoutManager(mLinearLayoutManager);
 
                 mRecyclerView.setAdapter(new BakeryStepAdapter(this, mBakeryPojo));
-
-//                mRecyclerView.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View view) {
-//                        Intent intent = new Intent(getBaseContext(),BakingVideosActivity.class);
-//                        Parcelable mWrapper = Parcels.wrap(mBakeryPojo);
-//                        Log.i(TAG, mBakeryPojo.getSteps().get(0).getVideoURL());
-//                        intent.putExtra("BakeryPojoObject", mWrapper);
-//
-//                    }
-//                });
             }
         }
-
-
     }
 }
 

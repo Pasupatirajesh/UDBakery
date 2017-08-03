@@ -6,9 +6,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,10 +49,7 @@ public class BakeryVideoFragment extends Fragment implements ExoPlayer.EventList
     private PlaybackStateCompat.Builder mStateBuilder;
     private TextView mTextView;
 
-    public  String mBakingPojo;
-    private String mBakingdescPojo;
-    private BakeryPojo mBakeryPojoObject;
-
+    public  BakeryPojo mBakingPojo;
     private Button nextButton;
     private Button prevButton;
 
@@ -86,26 +85,17 @@ public class BakeryVideoFragment extends Fragment implements ExoPlayer.EventList
         mExoPlayerView = v.findViewById(R.id.vv_simple);
         mTextView = v.findViewById(R.id.textView);
 
-        // Check BakeryStepAdapter class where I explicitly pass the videoURL by using getAdapterPosition() method
-        // retrieve the intent extra in the BakeryVideoFragment class to make the videos play in the exoplayer
-
-        // I am currently stuck on how to pass the videourl when user clicks next button.
-
-        // Can you give me suggestions on how to employ this functionality? I am getting errors when I use a similar strategy
-        // of passing videourl in a parcel. Hope I am putting my question across in a succinct manner.
-
-        // Error thrown at nextButton.setOnClickListener() implementation.
-
         mBakingPojo = Parcels.unwrap(myIntent.getParcelable("BakingPojo"));
 
-        mBakingdescPojo =Parcels.unwrap(myIntent.getParcelable("BakingDescPojo"));
+        Integer mposId = myIntent.getInt("BakingPosId");
 
+        Log.i(TAG, mposId+"");
 
         if(myIntent.getParcelable("BakingPojo")!=null)
             {
                 initializeMediaSession();
 
-                if(mBakingPojo.isEmpty())
+                if(mBakingPojo.getSteps().get(mposId).getVideoURL().isEmpty())
                 {
                     Bitmap artWork = BitmapFactory.decodeResource(getResources(),R.drawable.default_bakery);
 
@@ -120,21 +110,45 @@ public class BakeryVideoFragment extends Fragment implements ExoPlayer.EventList
                     Toast.makeText(getContext(), "No video for this step", Toast.LENGTH_SHORT).show();
                 }
 
-                mTextView.setText(mBakingdescPojo);
+                mTextView.setText(mBakingPojo.getSteps().get(mposId).getDescription());
 
-                initializePlayer(Uri.parse(mBakingPojo));
+                initializePlayer(Uri.parse(mBakingPojo.getSteps().get(mposId).getVideoURL()));
             }
+        if(mposId < mBakingPojo.getSteps().size()-1)
+            {
+                nextButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
 
-        nextButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                Intent nextVideoIntent = new Intent(getContext(), BakingVideosActivity.class);
-                nextVideoIntent.putExtra("BakingPojo", mBakeryPojoObject.getSteps().get(2).getVideoURL());
-//                getActivity().finish();
-                startActivity(nextVideoIntent);
+                        Intent nextVideoIntent = new Intent(getContext(), BakingVideosActivity.class);
+                        Parcelable mIdWraper = Parcels.wrap(mBakingPojo);
+                        nextVideoIntent.putExtra("BakingPosId",mposId+1);
+                        Log.i(TAG, mposId+"");
+                        nextVideoIntent.putExtra("BakingPojo", mIdWraper);
+                        getActivity().finish();
+                        startActivity(nextVideoIntent);
+                    }
+                });
+            } else
+            {
+                nextButton.setEnabled(false);
             }
-        });
+        if(mposId == 0)
+        {
+         prevButton.setEnabled(false);
+        } else {
+            prevButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent prevVideoIntent = new Intent(getContext(), BakingVideosActivity.class);
+                    Parcelable mIdWraper = Parcels.wrap(mBakingPojo);
+                    prevVideoIntent.putExtra("BakingPosId", mposId - 1);
+                    prevVideoIntent.putExtra("BakingPojo", mIdWraper);
+                    getActivity().finish();
+                    startActivity(prevVideoIntent);
+                }
+            });
+        }
         return v;
     }
 
