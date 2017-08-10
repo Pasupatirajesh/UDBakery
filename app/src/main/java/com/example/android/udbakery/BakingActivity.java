@@ -4,16 +4,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
 
 import com.example.android.udbakery.Model.BakeryPojo;
@@ -40,31 +38,61 @@ public class BakingActivity extends AppCompatActivity implements BakeryAdapter.o
 
     public RecyclerView mRecyclerView;
     public LinearLayoutManager mLinearLayoutManager;
+    public GridLayoutManager mGridLayoutManager;
     public BakeryAdapter mBakeryAdapter;
 
     public static Parcelable mWrapper;
 
     public static BakeryPojo mBakery;
 
+    private boolean mTwoPane;
+
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_baking);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
-            mBakeryModelList = new ArrayList<>();
 
-            mRecyclerView = (RecyclerView)findViewById(R.id.rv_recipe_card_layout);
+            if(findViewById(R.id.bakery_me_linear_layout)!=null)
+            {
+                Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+                setSupportActionBar(toolbar);
+                mTwoPane = true;
 
-            mBakeryAdapter = new BakeryAdapter(getApplicationContext(), (ArrayList<BakeryPojo>) mBakeryModelList, this);
+                mBakeryModelList = new ArrayList<>();
 
-            mLinearLayoutManager = new LinearLayoutManager(getApplicationContext());
+                mRecyclerView = (RecyclerView)findViewById(R.id.rv_recipe_card_layout);
 
-            mRecyclerView.setAdapter(mBakeryAdapter);
+                mBakeryAdapter = new BakeryAdapter(getApplicationContext(), (ArrayList<BakeryPojo>) mBakeryModelList, this);
 
-            mRecyclerView.setLayoutManager(mLinearLayoutManager);
+                mGridLayoutManager = new GridLayoutManager(getApplicationContext(), 2);
+
+                mRecyclerView.setAdapter(mBakeryAdapter);
+
+                mRecyclerView.setLayoutManager(mGridLayoutManager);
+
+
+            } else
+            {
+                Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+                setSupportActionBar(toolbar);
+                mTwoPane = false;
+
+                mBakeryModelList = new ArrayList<>();
+
+                mRecyclerView = (RecyclerView)findViewById(R.id.rv_recipe_card_layout);
+
+                mBakeryAdapter = new BakeryAdapter(getApplicationContext(), (ArrayList<BakeryPojo>) mBakeryModelList, this);
+
+                mLinearLayoutManager = new LinearLayoutManager(getApplicationContext());
+
+                mRecyclerView.setAdapter(mBakeryAdapter);
+
+                mRecyclerView.setLayoutManager(mLinearLayoutManager);
+            }
+
+
 
             Gson gson = new GsonBuilder().setLenient().create();
 
@@ -93,15 +121,15 @@ public class BakingActivity extends AppCompatActivity implements BakeryAdapter.o
                     Toast.makeText(getApplicationContext(), "Not working", Toast.LENGTH_SHORT).show();
                 }
             });
-            FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-
-            fab.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
-                }
-            });
+//            FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+//
+//            fab.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View view) {
+//                    Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                            .setAction("Action", null).show();
+//                }
+//            });
 
         }
 
@@ -134,7 +162,7 @@ public class BakingActivity extends AppCompatActivity implements BakeryAdapter.o
         Intent myIntent = new Intent(context, BakingDetailActivity.class);
         mBakery = mBakeryModelList.get(clickedListItem);
         mWrapper = Parcels.wrap(mBakery);
-        myIntent.putExtra("BakeryDataArrayList", mWrapper);
+        myIntent.putExtra("BakingPojo", mWrapper);
         startActivity(myIntent);
     }
 }

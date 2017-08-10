@@ -2,6 +2,7 @@ package com.example.android.udbakery;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Parcelable;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -26,10 +27,17 @@ public class BakeryStepAdapter extends RecyclerView.Adapter<BakeryStepAdapter.Vi
     private Parcelable mWrapper;
     private Parcelable mBakingWrapper;
     private Parcelable mIdWrapper;
-    public  BakeryStepAdapter(Context ct, BakeryPojo bakeryPojo)
+    private nextVideoInterface mNextVideoInterface;
+    public  BakeryStepAdapter(Context ct, BakeryPojo bakeryPojo, nextVideoInterface nextVideoInterface)
     {
         this.mContext = ct;
         this.mBakeryPojo = bakeryPojo;
+        this.mNextVideoInterface = nextVideoInterface;
+    }
+
+    public interface nextVideoInterface
+    {
+         void openVideo();
     }
 
     @Override
@@ -67,23 +75,30 @@ public class BakeryStepAdapter extends RecyclerView.Adapter<BakeryStepAdapter.Vi
 
         @Override
         public void onClick(View view) {
-            Intent intent =new Intent(mContext, BakingVideosActivity.class);
-
+            Configuration config = mContext.getResources().getConfiguration();
+            Intent intent = null;
+            if(config.smallestScreenWidthDp >=600)
+            {
+                 intent =new Intent(mContext, BakingDetailActivity.class);
+            } else
+            {
+                intent = new Intent(mContext, BakingVideosActivity.class);
+            }
             mWrapper = Parcels.wrap(mBakeryPojo);
-
 
             mBakingWrapper = Parcels.wrap(mBakeryPojo.getSteps().get(getAdapterPosition()).getDescription());
 
             mIdWrapper = Parcels.wrap(mBakeryPojo);
 
             Log.i(TAG, getAdapterPosition()+"");
-
             intent.putExtra("BakingPojo", mWrapper);
             intent.putExtra("BakingDescPojo", mBakingWrapper);
             intent.putExtra("BakingIdPojo", mIdWrapper);
             intent.putExtra("BakingPosId", getAdapterPosition());
 
             mContext.startActivity(intent);
+
+            mNextVideoInterface.openVideo();
         }
     }
 }

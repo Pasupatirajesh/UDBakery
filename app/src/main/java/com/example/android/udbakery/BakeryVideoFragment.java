@@ -2,6 +2,7 @@ package com.example.android.udbakery;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -55,6 +56,8 @@ public class BakeryVideoFragment extends Fragment implements ExoPlayer.EventList
 
     private static Bundle myIntent;
 
+
+
     public BakeryVideoFragment() {
         // Required empty public constructor
     }
@@ -81,6 +84,14 @@ public class BakeryVideoFragment extends Fragment implements ExoPlayer.EventList
         View v = inflater.inflate(R.layout.fragment_bakery_video, container, false);
         prevButton = v.findViewById(R.id.prev_button);
         nextButton = v.findViewById(R.id.next_button);
+
+        Configuration configuration = getActivity().getResources().getConfiguration();
+
+        if(configuration.smallestScreenWidthDp >=600)
+        {
+            prevButton.setVisibility(View.INVISIBLE);
+            nextButton.setVisibility(View.INVISIBLE);
+        }
 
         mExoPlayerView = v.findViewById(R.id.vv_simple);
         mTextView = v.findViewById(R.id.textView);
