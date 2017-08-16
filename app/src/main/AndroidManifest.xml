@@ -28,9 +28,24 @@
             android:parentActivityName=".BakingActivity"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
-        <activity android:name=".BakingVideosActivity"
+        <activity
+            android:name=".BakingVideosActivity"
             android:parentActivityName=".BakingActivity">
         </activity>
+
+        <receiver android:name=".BakeryWidgetProvider">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/bakery_widget_provider_info"/>
+        </receiver>
+
+
+        <service android:name=".ListViewWIdgetService"
+                 android:permission="android.permission.BIND_REMOTEVIEWS"/>
     </application>
 
 </manifest>

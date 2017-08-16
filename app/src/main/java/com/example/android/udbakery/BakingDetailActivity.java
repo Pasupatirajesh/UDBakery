@@ -1,5 +1,6 @@
 package com.example.android.udbakery;
 
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -7,11 +8,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.example.android.udbakery.Model.BakeryPojo;
 
 import org.parceler.Parcels;
+
+import java.util.List;
 
 public class BakingDetailActivity extends AppCompatActivity implements BakeryStepAdapter.nextVideoInterface{
 
@@ -23,7 +29,8 @@ public class BakingDetailActivity extends AppCompatActivity implements BakerySte
     private LinearLayoutManager mLinearLayoutManager;
     private TextView mIngredientsTextView;
     private BakeryStepAdapter mBakeryStepAdapter;
-    Bundle  myIntent;
+    private Bundle  myIntent;
+    private MenuItem mMenuItem;
 
 
     private Toolbar toolBar;
@@ -126,6 +133,49 @@ public class BakingDetailActivity extends AppCompatActivity implements BakerySte
     @Override
     public void openVideo() {
 
+
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+//        return super.onOptionsItemSelected(item);
+        int id = item.getItemId();
+
+        switch (id)
+        {
+            case R.id.fav_menu:
+                mMenuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem menuItem) {
+                        for(int i=0; i< mBakeryPojo.getIngredients().size(); i++) {
+
+                            List<BakeryPojo.Ingredient> ingredients = mBakeryPojo.getIngredients();
+
+                            Log.i("ingredientsSize", ingredients.size()+"");
+
+                            Intent intent = new Intent(BakingDetailActivity.this, BakeryWidgetProvider.class);
+
+                            intent.putExtra("homescreen_ingredient",Parcels.wrap(ingredients));
+
+                            intent.setAction(BakeryWidgetProvider.UPDATE_MEETING_ACTION);
+
+                            sendBroadcast(intent);
+                        }
+                        return true;
+                    }
+                });
+
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        getMenuInflater().inflate(R.menu.menu_baking, menu);
+        mMenuItem = menu.findItem(R.id.fav_menu);
+        return super.onCreateOptionsMenu(menu);
 
     }
 }

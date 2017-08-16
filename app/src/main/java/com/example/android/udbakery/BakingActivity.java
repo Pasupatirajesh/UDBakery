@@ -121,22 +121,14 @@ public class BakingActivity extends AppCompatActivity implements BakeryAdapter.o
                     Toast.makeText(getApplicationContext(), "Not working", Toast.LENGTH_SHORT).show();
                 }
             });
-//            FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//
-//            fab.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View view) {
-//                    Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                            .setAction("Action", null).show();
-//                }
-//            });
-
         }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_baking, menu);
+//        getMenuInflater().inflate(R.menu.menu_baking, menu);
+
+
         return true;
     }
 

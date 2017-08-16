@@ -7,4 +7,9 @@
         android:orderInCategory="100"
         android:title="@string/action_settings"
         app:showAsAction="never"/>
+
+    <item android:id="@+id/fav_menu"
+          android:icon="@mipmap/download"
+          android:title="favorite"
+          app:showAsAction="always"/>
 </menu>
