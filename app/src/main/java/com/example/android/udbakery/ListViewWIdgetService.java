@@ -1,21 +1,23 @@
 package com.example.android.udbakery;
 
+import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by SSubra27 on 8/15/17.
  */
 
 public class ListViewWIdgetService extends RemoteViewsService {
+
     @Override
     public RemoteViewsService.RemoteViewsFactory onGetViewFactory(Intent intent) {
+        int appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,
+                AppWidgetManager.INVALID_APPWIDGET_ID);
         return new ListViewsRemoteViewsFactory(this.getApplicationContext(), intent);
     }
 }
@@ -23,71 +25,65 @@ public class ListViewWIdgetService extends RemoteViewsService {
 
         class ListViewsRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory
         {
-            private Context mContext;
+            public static final String WIDGET_STRING = "com.example.android.udbakery.ListViewWidgetService";
 
-            private List<String> mIngredients;
+            private Context mContext= null;
 
-            private Bundle myBundle;
+            private String mIngredients;
+
+            private int appWidgetId;
+
+            private Intent myIntent;
 
             public ListViewsRemoteViewsFactory(Context applicationContext, Intent intent) {
 
                 this.mContext = applicationContext;
-
-                myBundle = intent.getExtras();
-
+                appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
+                this.myIntent = intent;
             }
+
 
             @Override
             public void onCreate() {
-
-                mIngredients = new ArrayList<String>();
             }
 
             @Override
             public void onDataSetChanged() {
-//                SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(mContext);
-//                pref.getString("homescreen_ingredient", "")
-
-                mIngredients = myBundle.getParcelable("homescreen_ingredient");
-
-
+                mIngredients = myIntent.getStringExtra(WIDGET_STRING);
+                Log.i("mIngredients", mIngredients+"");
             }
 
             @Override
             public void onDestroy() {
-                mIngredients.clear();
+
             }
 
             @Override
             public int getCount() {
-//                return mIngredients.size();
-                return 5;
+
+                return 10;
+
             }
 
             @Override
             public RemoteViews getViewAt(int i) {
 
-//                RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.widget_item);
-//
-////                String data = mIngredients.get(i);
-//
-//                rv.setTextViewText(R.id.item, data);
-//
-//                Bundle extras  = new Bundle();
-//
-//                extras.putInt("IG", i);
-//
-//                Intent fillIntent = new Intent();
-//
-//                fillIntent.putExtra("homescreen_ingredient", data);
-//
-//                fillIntent.putExtras(extras);
-//
-//                rv.setOnClickFillInIntent(R.id.item, fillIntent);
-//
-//                return rv;
-                return null;
 
+                RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.widget_item);
+
+                rv.setTextViewText(R.id.item, mIngredients);
+
+                Intent fillIntent = new Intent();
+
+                Bundle extras  = new Bundle();
+
+                extras.putString(BakeryWidgetProvider.UPDATE_MEETING_ACTION, mIngredients);
+
+                fillIntent.putExtras(extras);
+
+                rv.setOnClickFillInIntent(R.id.item, fillIntent);
+
+                return rv;
             }
 
             @Override

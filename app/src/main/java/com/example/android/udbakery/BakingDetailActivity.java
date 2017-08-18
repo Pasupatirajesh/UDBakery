@@ -8,7 +8,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -16,8 +15,6 @@ import android.widget.TextView;
 import com.example.android.udbakery.Model.BakeryPojo;
 
 import org.parceler.Parcels;
-
-import java.util.List;
 
 public class BakingDetailActivity extends AppCompatActivity implements BakeryStepAdapter.nextVideoInterface{
 
@@ -147,20 +144,17 @@ public class BakingDetailActivity extends AppCompatActivity implements BakerySte
                 mMenuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem menuItem) {
-                        for(int i=0; i< mBakeryPojo.getIngredients().size(); i++) {
 
-                            List<BakeryPojo.Ingredient> ingredients = mBakeryPojo.getIngredients();
+                        String ingrdient = mBakeryPojo.getIngredients().get(0).getIngredient();
 
-                            Log.i("ingredientsSize", ingredients.size()+"");
+                        Intent intent = new Intent(BakingDetailActivity.this, BakeryWidgetProvider.class);
 
-                            Intent intent = new Intent(BakingDetailActivity.this, BakeryWidgetProvider.class);
+                        intent.putExtra(BakeryWidgetProvider.UPDATE_MEETING_ACTION, ingrdient);
 
-                            intent.putExtra("homescreen_ingredient",Parcels.wrap(ingredients));
+                        intent.setAction(BakeryWidgetProvider.UPDATE_MEETING_ACTION);
 
-                            intent.setAction(BakeryWidgetProvider.UPDATE_MEETING_ACTION);
+                        sendBroadcast(intent);
 
-                            sendBroadcast(intent);
-                        }
                         return true;
                     }
                 });
