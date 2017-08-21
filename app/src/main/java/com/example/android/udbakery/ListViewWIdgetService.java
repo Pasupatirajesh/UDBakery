@@ -8,11 +8,16 @@ import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
+import org.parceler.Parcels;
+
+import java.util.ArrayList;
+
 /**
  * Created by SSubra27 on 8/15/17.
  */
 
 public class ListViewWIdgetService extends RemoteViewsService {
+    public static final String WIDGET_STRING = "com.example.android.udbakery.ListViewWidgetService";
 
     @Override
     public RemoteViewsService.RemoteViewsFactory onGetViewFactory(Intent intent) {
@@ -21,15 +26,11 @@ public class ListViewWIdgetService extends RemoteViewsService {
         return new ListViewsRemoteViewsFactory(this.getApplicationContext(), intent);
     }
 }
-
-
         class ListViewsRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory
         {
-            public static final String WIDGET_STRING = "com.example.android.udbakery.ListViewWidgetService";
+            private Context mContext;
 
-            private Context mContext= null;
-
-            private String mIngredients;
+            private ArrayList<String> mIngredients;
 
             private int appWidgetId;
 
@@ -40,8 +41,8 @@ public class ListViewWIdgetService extends RemoteViewsService {
                 this.mContext = applicationContext;
                 appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
                 this.myIntent = intent;
-            }
 
+            }
 
             @Override
             public void onCreate() {
@@ -49,8 +50,9 @@ public class ListViewWIdgetService extends RemoteViewsService {
 
             @Override
             public void onDataSetChanged() {
-                mIngredients = myIntent.getStringExtra(WIDGET_STRING);
-                Log.i("mIngredients", mIngredients+"");
+
+                mIngredients = Parcels.unwrap(myIntent.getParcelableExtra(ListViewWIdgetService.WIDGET_STRING));
+                Log.i("mService", mIngredients +"");
             }
 
             @Override
@@ -61,29 +63,28 @@ public class ListViewWIdgetService extends RemoteViewsService {
             @Override
             public int getCount() {
 
-                return 10;
-
+                return mIngredients.size();
             }
-
             @Override
             public RemoteViews getViewAt(int i) {
 
 
                 RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.widget_item);
 
-                rv.setTextViewText(R.id.item, mIngredients);
+                rv.setTextViewText(R.id.item, mIngredients.get(i));
 
                 Intent fillIntent = new Intent();
 
                 Bundle extras  = new Bundle();
 
-                extras.putString(BakeryWidgetProvider.UPDATE_MEETING_ACTION, mIngredients);
+                extras.putString(BakeryWidgetProvider.UPDATE_MEETING_ACTION, mIngredients.get(i));
 
                 fillIntent.putExtras(extras);
 
                 rv.setOnClickFillInIntent(R.id.item, fillIntent);
 
                 return rv;
+//                return  null;
             }
 
             @Override

@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -15,6 +16,9 @@ import android.widget.TextView;
 import com.example.android.udbakery.Model.BakeryPojo;
 
 import org.parceler.Parcels;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class BakingDetailActivity extends AppCompatActivity implements BakeryStepAdapter.nextVideoInterface{
 
@@ -28,6 +32,8 @@ public class BakingDetailActivity extends AppCompatActivity implements BakerySte
     private BakeryStepAdapter mBakeryStepAdapter;
     private Bundle  myIntent;
     private MenuItem mMenuItem;
+
+    private List<String> mList;
 
 
     private Toolbar toolBar;
@@ -144,12 +150,16 @@ public class BakingDetailActivity extends AppCompatActivity implements BakerySte
                 mMenuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem menuItem) {
+                        mList = new ArrayList<String>();
+                        for (int i = 0; i < mBakeryPojo.getIngredients().size(); i++) {
+                            mList.add(mBakeryPojo.getIngredients().get(i).getIngredient());
 
-                        String ingrdient = mBakeryPojo.getIngredients().get(0).getIngredient();
+                            Log.i("mList", mList.toString());
+                        }
 
                         Intent intent = new Intent(BakingDetailActivity.this, BakeryWidgetProvider.class);
 
-                        intent.putExtra(BakeryWidgetProvider.UPDATE_MEETING_ACTION, ingrdient);
+                        intent.putExtra(BakeryWidgetProvider.UPDATE_MEETING_ACTION, Parcels.wrap(mList));
 
                         intent.setAction(BakeryWidgetProvider.UPDATE_MEETING_ACTION);
 
@@ -158,6 +168,9 @@ public class BakingDetailActivity extends AppCompatActivity implements BakerySte
                         return true;
                     }
                 });
+
+
+
 
         }
 

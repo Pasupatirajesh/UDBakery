@@ -11,49 +11,65 @@ import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
+import org.parceler.Parcels;
+
+import java.util.ArrayList;
+
 /**
  * Implementation of App Widget functionality.
  */
 public class BakeryWidgetProvider extends AppWidgetProvider {
     public static final String UPDATE_MEETING_ACTION = "android.appwidget.action.APPWIDGET_UPDATE";
-    String ingredient;
+
+    public static ArrayList<String> mIngredients ;
+
+    public Intent myIntent = null;
+
     @Override
     public void onReceive(Context context, Intent intent) {
+
+        this.myIntent = intent;
+
+        mIngredients = Parcels.unwrap(myIntent.getParcelableExtra(UPDATE_MEETING_ACTION));
+
         AppWidgetManager mgr = AppWidgetManager.getInstance(context.getApplicationContext());
 
         Toast.makeText(context.getApplicationContext(), "onReceive Called", Toast.LENGTH_SHORT).show();
 
         int appWidgetIds[] = mgr.getAppWidgetIds(new ComponentName(context.getApplicationContext(), BakeryWidgetProvider.class));
+
+
         mgr.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.list_view);
 
-        String ingredient = intent.getStringExtra(UPDATE_MEETING_ACTION);
+        onUpdate(context.getApplicationContext(), mgr ,appWidgetIds);
 
-        Log.i("onReceive",  ingredient+"");
 
-        super.onReceive(context, intent);
+        super.onReceive(context.getApplicationContext(), intent);
     }
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-        // There may be multiple widgets active, so update all of them
+        // There may be multiple widgets active, so update all of themfor(int i =0; i< mIngredients.size(); i++)
+
         for (int i =0; i<appWidgetIds.length; i++) {
             Log.i("appWdgetIds", appWidgetIds.length+"");
 
             Intent intent = new Intent(context.getApplicationContext(), ListViewWIdgetService.class);
+            intent.putExtra(ListViewWIdgetService.WIDGET_STRING, Parcels.wrap(mIngredients));
+
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetIds[i]);
-            intent.putExtra(ListViewsRemoteViewsFactory.WIDGET_STRING, ingredient );
-            Log.i("servicestring", ingredient+"");
+
+
             intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));
-            RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.bakery_widget_provider);
+            RemoteViews rv = new RemoteViews(context.getApplicationContext().getPackageName(), R.layout.bakery_widget_provider);
             rv.setRemoteAdapter(appWidgetIds[i], R.id.list_view, intent);
 
 
             Intent startActivityIntent = new Intent(context.getApplicationContext(), BakingActivity.class);
-            PendingIntent pd = PendingIntent.getActivity(context, 0, startActivityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent pd = PendingIntent.getActivity(context.getApplicationContext(), 0, startActivityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             rv.setPendingIntentTemplate(R.id.list_view, pd);
             appWidgetManager.updateAppWidget(appWidgetIds[i], rv);
-            super.onUpdate(context, appWidgetManager, appWidgetIds);
-
+            super.onUpdate(context.getApplicationContext(), appWidgetManager, appWidgetIds);
         }
     }
 
