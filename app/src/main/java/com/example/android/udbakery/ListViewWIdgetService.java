@@ -3,14 +3,14 @@ package com.example.android.udbakery;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
-import org.parceler.Parcels;
-
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by SSubra27 on 8/15/17.
@@ -30,18 +30,16 @@ public class ListViewWIdgetService extends RemoteViewsService {
         {
             private Context mContext;
 
-            private ArrayList<String> mIngredients;
+            private List<String> mIngredients ;
 
             private int appWidgetId;
 
-            private Intent myIntent;
+            Set<String> ingredients;
 
             public ListViewsRemoteViewsFactory(Context applicationContext, Intent intent) {
 
-                this.mContext = applicationContext;
+                this.mContext = applicationContext.getApplicationContext();
                 appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
-                this.myIntent = intent;
-
             }
 
             @Override
@@ -50,9 +48,14 @@ public class ListViewWIdgetService extends RemoteViewsService {
 
             @Override
             public void onDataSetChanged() {
+                SharedPreferences settings;
 
-                mIngredients = Parcels.unwrap(myIntent.getParcelableExtra(ListViewWIdgetService.WIDGET_STRING));
-                Log.i("mService", mIngredients +"");
+                settings = mContext.getSharedPreferences(BakingDetailActivity.PREFS_NAME, Context.MODE_PRIVATE);
+                if(settings.contains(BakeryWidgetProvider.UPDATE_MEETING_ACTION))
+                {
+                   ingredients = settings.getStringSet(BakeryWidgetProvider.UPDATE_MEETING_ACTION, null);
+                    mIngredients = new ArrayList<>(ingredients);
+                }
             }
 
             @Override
@@ -63,11 +66,10 @@ public class ListViewWIdgetService extends RemoteViewsService {
             @Override
             public int getCount() {
 
-                return mIngredients.size();
+                return mIngredients.size() ;
             }
             @Override
             public RemoteViews getViewAt(int i) {
-
 
                 RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.widget_item);
 
@@ -84,7 +86,7 @@ public class ListViewWIdgetService extends RemoteViewsService {
                 rv.setOnClickFillInIntent(R.id.item, fillIntent);
 
                 return rv;
-//                return  null;
+
             }
 
             @Override

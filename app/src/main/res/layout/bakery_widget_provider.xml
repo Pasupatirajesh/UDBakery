@@ -10,8 +10,7 @@
         android:id="@+id/iv_items"
         android:layout_height="100dp"
         android:layout_width="match_parent"
-        android:layout_gravity= "center"
-        android:src="@mipmap/ic_brownie"/>
+        android:layout_gravity= "center"/>
 
     <ListView
         android:id="@+id/list_view"

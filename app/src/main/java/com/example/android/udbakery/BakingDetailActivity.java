@@ -1,6 +1,7 @@
 package com.example.android.udbakery;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -8,7 +9,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -18,12 +18,15 @@ import com.example.android.udbakery.Model.BakeryPojo;
 import org.parceler.Parcels;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class BakingDetailActivity extends AppCompatActivity implements BakeryStepAdapter.nextVideoInterface{
 
 
     private static final String TAG = BakingDetailActivity.class.getSimpleName();
+
+    public static final String PREFS_NAME = "BAKERY_APP";
 
     public static BakeryPojo mBakeryPojo;
     private RecyclerView mRecyclerView;
@@ -33,7 +36,8 @@ public class BakingDetailActivity extends AppCompatActivity implements BakerySte
     private Bundle  myIntent;
     private MenuItem mMenuItem;
 
-    private List<String> mList;
+
+    private ArrayList<String> mList;
 
 
     private Toolbar toolBar;
@@ -154,16 +158,27 @@ public class BakingDetailActivity extends AppCompatActivity implements BakerySte
                         for (int i = 0; i < mBakeryPojo.getIngredients().size(); i++) {
                             mList.add(mBakeryPojo.getIngredients().get(i).getIngredient());
 
-                            Log.i("mList", mList.toString());
+                            Set<String> set = new HashSet<String>();
+
+                            set.addAll(mList);
+
+                            SharedPreferences setings ;
+                            SharedPreferences.Editor editor;
+                            setings = getApplicationContext().getSharedPreferences(PREFS_NAME
+                            , getApplicationContext().MODE_PRIVATE);
+
+                            editor = setings.edit();
+
+                            editor.putStringSet(BakeryWidgetProvider.UPDATE_MEETING_ACTION, set);
+
+                            editor.commit();
+
+                            Intent intent = new Intent(BakingDetailActivity.this, BakeryWidgetProvider.class);
+
+                            intent.setAction(BakeryWidgetProvider.UPDATE_MEETING_ACTION);
+
+                            sendBroadcast(intent);
                         }
-
-                        Intent intent = new Intent(BakingDetailActivity.this, BakeryWidgetProvider.class);
-
-                        intent.putExtra(BakeryWidgetProvider.UPDATE_MEETING_ACTION, Parcels.wrap(mList));
-
-                        intent.setAction(BakeryWidgetProvider.UPDATE_MEETING_ACTION);
-
-                        sendBroadcast(intent);
 
                         return true;
                     }

@@ -6,31 +6,19 @@ import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.TypedArray;
 import android.net.Uri;
 import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.Toast;
-
-import org.parceler.Parcels;
-
-import java.util.ArrayList;
 
 /**
  * Implementation of App Widget functionality.
  */
 public class BakeryWidgetProvider extends AppWidgetProvider {
     public static final String UPDATE_MEETING_ACTION = "android.appwidget.action.APPWIDGET_UPDATE";
-
-    public static ArrayList<String> mIngredients ;
-
-    public Intent myIntent = null;
-
     @Override
     public void onReceive(Context context, Intent intent) {
-
-        this.myIntent = intent;
-
-        mIngredients = Parcels.unwrap(myIntent.getParcelableExtra(UPDATE_MEETING_ACTION));
 
         AppWidgetManager mgr = AppWidgetManager.getInstance(context.getApplicationContext());
 
@@ -40,9 +28,6 @@ public class BakeryWidgetProvider extends AppWidgetProvider {
 
 
         mgr.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.list_view);
-
-        onUpdate(context.getApplicationContext(), mgr ,appWidgetIds);
-
 
         super.onReceive(context.getApplicationContext(), intent);
     }
@@ -55,13 +40,20 @@ public class BakeryWidgetProvider extends AppWidgetProvider {
             Log.i("appWdgetIds", appWidgetIds.length+"");
 
             Intent intent = new Intent(context.getApplicationContext(), ListViewWIdgetService.class);
-            intent.putExtra(ListViewWIdgetService.WIDGET_STRING, Parcels.wrap(mIngredients));
 
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetIds[i]);
 
 
             intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));
+
             RemoteViews rv = new RemoteViews(context.getApplicationContext().getPackageName(), R.layout.bakery_widget_provider);
+
+            TypedArray imgs = context.getResources().obtainTypedArray(R.array.bakery_imgs);
+
+            rv.setImageViewResource(R.id.iv_items, (imgs.getResourceId(i, -1)));
+
+            imgs.recycle();
+
             rv.setRemoteAdapter(appWidgetIds[i], R.id.list_view, intent);
 
 
