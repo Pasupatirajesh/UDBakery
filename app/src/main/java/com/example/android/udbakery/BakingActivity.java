@@ -45,6 +45,8 @@ public class BakingActivity extends AppCompatActivity implements BakeryAdapter.o
 
     public static BakeryPojo mBakery;
 
+    public static Bundle mBundleRecyclerViewState;
+
     private boolean mTwoPane;
 
 
@@ -53,11 +55,11 @@ public class BakingActivity extends AppCompatActivity implements BakeryAdapter.o
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_baking);
 
-
             if(findViewById(R.id.bakery_me_linear_layout)!=null)
             {
                 Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
                 setSupportActionBar(toolbar);
+
                 mTwoPane = true;
 
                 mBakeryModelList = new ArrayList<>();
@@ -73,15 +75,14 @@ public class BakingActivity extends AppCompatActivity implements BakeryAdapter.o
                 mRecyclerView.setLayoutManager(mGridLayoutManager);
 
 
-            } else
-            {
+            } else {
                 Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
                 setSupportActionBar(toolbar);
                 mTwoPane = false;
 
                 mBakeryModelList = new ArrayList<>();
 
-                mRecyclerView = (RecyclerView)findViewById(R.id.rv_recipe_card_layout);
+                mRecyclerView = (RecyclerView) findViewById(R.id.rv_recipe_card_layout);
 
                 mBakeryAdapter = new BakeryAdapter(getApplicationContext(), (ArrayList<BakeryPojo>) mBakeryModelList, this);
 
@@ -91,8 +92,6 @@ public class BakingActivity extends AppCompatActivity implements BakeryAdapter.o
 
                 mRecyclerView.setLayoutManager(mLinearLayoutManager);
             }
-
-
 
             Gson gson = new GsonBuilder().setLenient().create();
 
@@ -122,6 +121,25 @@ public class BakingActivity extends AppCompatActivity implements BakeryAdapter.o
                 }
             });
         }
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        mBundleRecyclerViewState = new Bundle();
+        Parcelable listState = mRecyclerView.getLayoutManager().onSaveInstanceState();
+        mBundleRecyclerViewState.putParcelable("KEY_RECYCLER_STATE", listState);
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(mBundleRecyclerViewState !=null)
+        {
+            Parcelable listState = mBundleRecyclerViewState.getParcelable("KEY_RECYCLER_STATE");
+            mRecyclerView.getLayoutManager().onRestoreInstanceState(listState);
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -157,4 +175,6 @@ public class BakingActivity extends AppCompatActivity implements BakeryAdapter.o
         myIntent.putExtra("BakingPojo", mWrapper);
         startActivity(myIntent);
     }
+
+
 }

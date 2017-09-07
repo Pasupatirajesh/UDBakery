@@ -17,7 +17,7 @@ import android.widget.Toast;
  */
 public class BakeryWidgetProvider extends AppWidgetProvider {
     public static final String UPDATE_MEETING_ACTION = "android.appwidget.action.APPWIDGET_UPDATE";
-    @Override
+     @Override
     public void onReceive(Context context, Intent intent) {
 
         AppWidgetManager mgr = AppWidgetManager.getInstance(context.getApplicationContext());

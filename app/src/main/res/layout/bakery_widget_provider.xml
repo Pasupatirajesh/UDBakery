@@ -10,7 +10,8 @@
         android:id="@+id/iv_items"
         android:layout_height="100dp"
         android:layout_width="match_parent"
-        android:layout_gravity= "center"/>
+        android:layout_gravity= "center"
+        android:src="@drawable/cheese_cake"/>
 
     <ListView
         android:id="@+id/list_view"

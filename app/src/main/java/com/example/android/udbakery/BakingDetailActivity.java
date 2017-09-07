@@ -171,7 +171,7 @@ public class BakingDetailActivity extends AppCompatActivity implements BakerySte
 
                             editor.putStringSet(BakeryWidgetProvider.UPDATE_MEETING_ACTION, set);
 
-                            editor.commit();
+                            editor.apply();
 
                             Intent intent = new Intent(BakingDetailActivity.this, BakeryWidgetProvider.class);
 
@@ -183,10 +183,6 @@ public class BakingDetailActivity extends AppCompatActivity implements BakerySte
                         return true;
                     }
                 });
-
-
-
-
         }
 
         return super.onOptionsItemSelected(item);

@@ -9,6 +9,7 @@ import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -51,9 +52,14 @@ public class ListViewWIdgetService extends RemoteViewsService {
                 SharedPreferences settings;
 
                 settings = mContext.getSharedPreferences(BakingDetailActivity.PREFS_NAME, Context.MODE_PRIVATE);
-                if(settings.contains(BakeryWidgetProvider.UPDATE_MEETING_ACTION))
+                if(settings.contains(BakeryWidgetProvider.UPDATE_MEETING_ACTION) && settings!=null)
                 {
                    ingredients = settings.getStringSet(BakeryWidgetProvider.UPDATE_MEETING_ACTION, null);
+                    mIngredients = new ArrayList<>(ingredients);
+                } else
+
+                {
+                    ingredients = Collections.emptySet();
                     mIngredients = new ArrayList<>(ingredients);
                 }
             }

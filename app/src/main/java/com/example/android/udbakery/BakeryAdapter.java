@@ -33,6 +33,8 @@ public class BakeryAdapter extends RecyclerView.Adapter<BakeryAdapter.ViewHolder
 
     public interface onItemClickedInterface
     {
+
+
         void onItemClicked(int clickedListItem);
     }
 
@@ -61,6 +63,8 @@ public class BakeryAdapter extends RecyclerView.Adapter<BakeryAdapter.ViewHolder
 
     }
 
+
+
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener
     {
         private Button mRecipeButton;
@@ -78,11 +82,15 @@ public class BakeryAdapter extends RecyclerView.Adapter<BakeryAdapter.ViewHolder
             mOnItemClickedInterface.onItemClicked(itemClicked);
 
         }
+
     }
+
+
 
     public void setBakeryData(ArrayList<BakeryPojo> bakeryData)
     {
         mBakeryItemData = bakeryData;
         notifyDataSetChanged();
     }
+
 }

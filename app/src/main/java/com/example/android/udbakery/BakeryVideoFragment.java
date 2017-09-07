@@ -271,7 +271,12 @@ public class BakeryVideoFragment extends Fragment implements ExoPlayer.EventList
     @Override
     public void onDetach() {
         super.onDetach();
-        mExoPlayer.release();
+
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        mExoPlayer.release();
+    }
 }
