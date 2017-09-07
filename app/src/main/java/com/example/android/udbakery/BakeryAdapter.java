@@ -65,6 +65,8 @@ public class BakeryAdapter extends RecyclerView.Adapter<BakeryAdapter.ViewHolder
 
 
 
+
+
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener
     {
         private Button mRecipeButton;
@@ -82,6 +84,7 @@ public class BakeryAdapter extends RecyclerView.Adapter<BakeryAdapter.ViewHolder
             mOnItemClickedInterface.onItemClicked(itemClicked);
 
         }
+
 
     }
 

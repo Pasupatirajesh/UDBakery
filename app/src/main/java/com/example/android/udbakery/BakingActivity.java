@@ -45,7 +45,7 @@ public class BakingActivity extends AppCompatActivity implements BakeryAdapter.o
 
     public static BakeryPojo mBakery;
 
-    public static Bundle mBundleRecyclerViewState;
+    public static Parcelable mBundleRecyclerViewState;
 
     private boolean mTwoPane;
 
@@ -79,18 +79,13 @@ public class BakingActivity extends AppCompatActivity implements BakeryAdapter.o
                 Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
                 setSupportActionBar(toolbar);
                 mTwoPane = false;
-
                 mBakeryModelList = new ArrayList<>();
-
                 mRecyclerView = (RecyclerView) findViewById(R.id.rv_recipe_card_layout);
-
                 mBakeryAdapter = new BakeryAdapter(getApplicationContext(), (ArrayList<BakeryPojo>) mBakeryModelList, this);
 
                 mLinearLayoutManager = new LinearLayoutManager(getApplicationContext());
-
-                mRecyclerView.setAdapter(mBakeryAdapter);
-
                 mRecyclerView.setLayoutManager(mLinearLayoutManager);
+                mRecyclerView.setAdapter(mBakeryAdapter);
             }
 
             Gson gson = new GsonBuilder().setLenient().create();
@@ -120,24 +115,42 @@ public class BakingActivity extends AppCompatActivity implements BakeryAdapter.o
                     Toast.makeText(getApplicationContext(), "Not working", Toast.LENGTH_SHORT).show();
                 }
             });
+
         }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        mBundleRecyclerViewState = outState;
+        if (mBundleRecyclerViewState == null)
+        {
+            mBundleRecyclerViewState = new Bundle();
+        }
+        mBundleRecyclerViewState = mRecyclerView.getLayoutManager().onSaveInstanceState();
+        outState.putParcelable("KEY_RECYCLER_STATE", mBundleRecyclerViewState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if(savedInstanceState!=null)
+        {
+            mBundleRecyclerViewState = savedInstanceState.getParcelable("KEY_RECYCLER_STATE");
+        }
+    }
+
     @Override
     protected void onPause() {
         super.onPause();
-
-        mBundleRecyclerViewState = new Bundle();
-        Parcelable listState = mRecyclerView.getLayoutManager().onSaveInstanceState();
-        mBundleRecyclerViewState.putParcelable("KEY_RECYCLER_STATE", listState);
 
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if(mBundleRecyclerViewState !=null)
+        if(mBundleRecyclerViewState!=null)
         {
-            Parcelable listState = mBundleRecyclerViewState.getParcelable("KEY_RECYCLER_STATE");
-            mRecyclerView.getLayoutManager().onRestoreInstanceState(listState);
+            mLinearLayoutManager.onRestoreInstanceState(mBundleRecyclerViewState);
         }
     }
 
@@ -145,8 +158,6 @@ public class BakingActivity extends AppCompatActivity implements BakeryAdapter.o
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
 //        getMenuInflater().inflate(R.menu.menu_baking, menu);
-
-
         return true;
     }
 
