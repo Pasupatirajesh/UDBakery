@@ -11,15 +11,18 @@ import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.udbakery.Model.BakeryPojo;
+import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
@@ -37,8 +40,14 @@ import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
+import com.squareup.picasso.Picasso;
 
 import org.parceler.Parcels;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.example.android.udbakery.BakingDetailActivity.mBakeryPojo;
 
 
 public class BakeryVideoFragment extends Fragment implements ExoPlayer.EventListener{
@@ -49,13 +58,19 @@ public class BakeryVideoFragment extends Fragment implements ExoPlayer.EventList
     private MediaSessionCompat mMediaSession;
     private PlaybackStateCompat.Builder mStateBuilder;
     private TextView mTextView;
+    private ImageView mImageView;
 
     public  BakeryPojo mBakingPojo;
     private Button nextButton;
     private Button prevButton;
+    static Integer mposId;
+    static long position;
+    private int mStepId;
+    private String mTitle;
+    private List<BakeryPojo.Steps> steps = new ArrayList<>();
 
     private static Bundle myIntent;
-
+    private Uri videoUri;
 
 
     public BakeryVideoFragment() {
@@ -85,32 +100,47 @@ public class BakeryVideoFragment extends Fragment implements ExoPlayer.EventList
         prevButton = v.findViewById(R.id.prev_button);
         nextButton = v.findViewById(R.id.next_button);
 
+
         Configuration configuration = getActivity().getResources().getConfiguration();
 
-        if(configuration.smallestScreenWidthDp >=600)
-        {
+        if (configuration.smallestScreenWidthDp >= 700) {
             prevButton.setVisibility(View.INVISIBLE);
             nextButton.setVisibility(View.INVISIBLE);
         }
-
+        mImageView = v.findViewById(R.id.iv_recipe_image_view);
         mExoPlayerView = v.findViewById(R.id.vv_simple);
         mTextView = v.findViewById(R.id.textView);
 
         mBakingPojo = Parcels.unwrap(myIntent.getParcelable("BakingPojo"));
 
-        Integer mposId = myIntent.getInt("BakingPosId");
+        steps = mBakingPojo.getSteps();
 
-        Log.i(TAG, mposId+"");
+        mposId = myIntent.getInt("BakingPosId");
 
-        if(myIntent.getParcelable("BakingPojo")!=null)
+        Log.i(TAG, mposId + "");
+
+        if (myIntent.getParcelable("BakingPojo") != null) {
+
+            if (savedInstanceState!=null)
             {
+                steps =Parcels.unwrap(savedInstanceState.getParcelable("SELECTED_STEPS"));
+                position = savedInstanceState.getLong("SELECTED_POSITION");
+                mposId = savedInstanceState.getInt("SELECTED_INDEX");
+            }
+
+            if (!TextUtils.isEmpty(steps.get(mposId).getThumbnailURL())) {
+                Picasso.with(getContext()).load(mBakingPojo.getSteps().get(mposId).getThumbnailURL()).into(mImageView);
+            } else {
+                mImageView.setEnabled(false);
+
                 initializeMediaSession();
 
-                if(mBakingPojo.getSteps().get(mposId).getVideoURL().isEmpty())
-                {
-                    Bitmap artWork = BitmapFactory.decodeResource(getResources(),R.drawable.default_bakery);
+            }
+                if (steps.get(mposId).getVideoURL().isEmpty()) {
 
-                    int nh = (int) (artWork.getHeight() * (512.0/ artWork.getWidth()));
+                    Bitmap artWork = BitmapFactory.decodeResource(getResources(), R.drawable.default_bakery);
+
+                    int nh = (int) (artWork.getHeight() * (512.0 / artWork.getWidth()));
 
                     Bitmap b = Bitmap.createScaledBitmap(artWork, 512, nh, true);
 
@@ -120,46 +150,46 @@ public class BakeryVideoFragment extends Fragment implements ExoPlayer.EventList
 
                     Toast.makeText(getContext(), "No video for this step", Toast.LENGTH_SHORT).show();
                 }
+                mTextView.setText(steps.get(mposId).getDescription());
 
-                mTextView.setText(mBakingPojo.getSteps().get(mposId).getDescription());
+                videoUri = Uri.parse(steps.get(mposId).getVideoURL());
 
-                initializePlayer(Uri.parse(mBakingPojo.getSteps().get(mposId).getVideoURL()));
+                initializePlayer(videoUri);
             }
-        if(mposId < mBakingPojo.getSteps().size()-1)
-            {
+
+            if (mposId < steps.size() - 1) {
                 nextButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
 
                         Intent nextVideoIntent = new Intent(getContext(), BakingVideosActivity.class);
                         Parcelable mIdWraper = Parcels.wrap(mBakingPojo);
-                        nextVideoIntent.putExtra("BakingPosId",mposId+1);
-                        Log.i(TAG, mposId+"");
+                        nextVideoIntent.putExtra("BakingPosId", mposId + 1);
+                        Log.i(TAG, mposId + "");
                         nextVideoIntent.putExtra("BakingPojo", mIdWraper);
                         getActivity().finish();
                         startActivity(nextVideoIntent);
                     }
                 });
-            } else
-            {
+            } else {
                 nextButton.setEnabled(false);
             }
-        if(mposId == 0)
-        {
-         prevButton.setEnabled(false);
-        } else {
-            prevButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Intent prevVideoIntent = new Intent(getContext(), BakingVideosActivity.class);
-                    Parcelable mIdWraper = Parcels.wrap(mBakingPojo);
-                    prevVideoIntent.putExtra("BakingPosId", mposId - 1);
-                    prevVideoIntent.putExtra("BakingPojo", mIdWraper);
-                    getActivity().finish();
-                    startActivity(prevVideoIntent);
-                }
-            });
-        }
+            if (mposId == 0) {
+                prevButton.setEnabled(false);
+            } else {
+                prevButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent prevVideoIntent = new Intent(getContext(), BakingVideosActivity.class);
+                        Parcelable mIdWraper = Parcels.wrap(mBakingPojo);
+                        prevVideoIntent.putExtra("BakingPosId", mposId - 1);
+                        prevVideoIntent.putExtra("BakingPojo", mIdWraper);
+                        getActivity().finish();
+                        startActivity(prevVideoIntent);
+                    }
+                });
+            }
+
         return v;
     }
 
@@ -179,6 +209,7 @@ public class BakeryVideoFragment extends Fragment implements ExoPlayer.EventList
             String userAgent = Util.getUserAgent(getContext(), "BakeryVideos");
             MediaSource mediaSource = new ExtractorMediaSource(mediaUri, new DefaultDataSourceFactory(
                     getContext(), userAgent), new DefaultExtractorsFactory(), null, null);
+            if(position != C.TIME_UNSET) mExoPlayer.seekTo(position);
             mExoPlayer.prepare(mediaSource);
             mExoPlayer.setPlayWhenReady(true);
         }
@@ -208,6 +239,17 @@ public class BakeryVideoFragment extends Fragment implements ExoPlayer.EventList
 
         // start the session
         mMediaSession.setActive(true);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putParcelable("SELECTED_STEPS", Parcels.wrap(steps));
+        outState.putInt("SELECTED_INDEX", mposId);
+        outState.putString("Title", mBakeryPojo.getName());
+        outState.putLong("SELECTED_POSITION", position);
+
     }
 
     private class mySessionCallback extends MediaSessionCompat.Callback {
@@ -277,6 +319,21 @@ public class BakeryVideoFragment extends Fragment implements ExoPlayer.EventList
     @Override
     public void onPause() {
         super.onPause();
-        mExoPlayer.release();
+        if(mExoPlayer!=null)
+        {
+            position = mExoPlayer.getCurrentPosition();
+            mExoPlayer.stop();
+            mExoPlayer.release();
+            mExoPlayer = null;
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(videoUri!=null)
+        {
+            initializePlayer(videoUri);
+        }
     }
 }

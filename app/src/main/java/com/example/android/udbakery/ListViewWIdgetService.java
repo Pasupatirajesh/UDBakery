@@ -55,7 +55,14 @@ public class ListViewWIdgetService extends RemoteViewsService {
                 if(settings.contains(BakeryWidgetProvider.UPDATE_MEETING_ACTION) && settings!=null)
                 {
                    ingredients = settings.getStringSet(BakeryWidgetProvider.UPDATE_MEETING_ACTION, null);
-                    mIngredients = new ArrayList<>(ingredients);
+                    if(ingredients == null)
+                    {
+                        mIngredients = new ArrayList<>();
+                    }else
+                    {
+                        mIngredients = new ArrayList<>(ingredients);
+                    }
+
                 } else
 
                 {

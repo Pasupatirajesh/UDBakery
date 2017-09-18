@@ -2,14 +2,12 @@ package com.example.android.udbakery;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
-import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Instrumentation test, which will execute on an Android device.
@@ -26,16 +24,4 @@ public class ExampleInstrumentedTest {
         assertEquals("com.example.android.udbakery", appContext.getPackageName());
 
     }
-
-    @Rule
-    public ActivityTestRule<BakingActivity> mBakingActivityActivityTestRule
-            = new ActivityTestRule<BakingActivity>(BakingActivity.class);
-
-
-    @Test
-    public void isButtonTextEmpty()
-    {
-
-    }
-
 }

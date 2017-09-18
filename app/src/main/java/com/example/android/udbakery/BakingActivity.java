@@ -2,8 +2,10 @@ package com.example.android.udbakery;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -12,6 +14,8 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.udbakery.Model.BakeryPojo;
@@ -29,7 +33,8 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class BakingActivity extends AppCompatActivity implements BakeryAdapter.onItemClickedInterface{
+public class BakingActivity extends AppCompatActivity implements BakeryAdapter.onItemClickedInterface, ConnectivityReceiver.ConnectivityReceiverListener
+{
 
     private static final String TAG = BakingActivity.class.getSimpleName();
     private static final String API_URL = "https://d17h27t6h515a5.cloudfront.net/";
@@ -46,6 +51,8 @@ public class BakingActivity extends AppCompatActivity implements BakeryAdapter.o
     public static BakeryPojo mBakery;
 
     public static Parcelable mBundleRecyclerViewState;
+
+    public static Parcelable mDoubleWrapper;
 
     private boolean mTwoPane;
 
@@ -88,6 +95,7 @@ public class BakingActivity extends AppCompatActivity implements BakeryAdapter.o
                 mRecyclerView.setAdapter(mBakeryAdapter);
             }
 
+            checkConnection();
             Gson gson = new GsonBuilder().setLenient().create();
 
 
@@ -118,6 +126,36 @@ public class BakingActivity extends AppCompatActivity implements BakeryAdapter.o
 
         }
 
+        private void checkConnection()
+        {
+            boolean isConnected = ConnectivityReceiver.isConnected();
+            showSnack(isConnected);
+        }
+
+    private void showSnack(boolean isConnected) {
+
+        String message;
+        int color;
+
+        if(isConnected)
+        {
+            message = "Internet Available";
+            color = Color.WHITE;
+        } else
+        {
+            message = "Sorry, No Internet Connection";
+            color = Color.BLUE;
+        }
+
+        Snackbar snakcBar = Snackbar.make(findViewById(R.id.fab), message, Snackbar.LENGTH_LONG);
+
+        View sbView = snakcBar.getView();
+        TextView textView = sbView.findViewById(android.support.design.R.id.snackbar_text);
+        textView.setTextColor(color);
+        snakcBar.show();
+    }
+
+
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -128,6 +166,8 @@ public class BakingActivity extends AppCompatActivity implements BakeryAdapter.o
         }
         mBundleRecyclerViewState = mRecyclerView.getLayoutManager().onSaveInstanceState();
         outState.putParcelable("KEY_RECYCLER_STATE", mBundleRecyclerViewState);
+        mDoubleWrapper = Parcels.wrap(mBakeryModelList);
+        outState.putParcelable("DATA", mDoubleWrapper);
     }
 
     @Override
@@ -136,6 +176,12 @@ public class BakingActivity extends AppCompatActivity implements BakeryAdapter.o
         if(savedInstanceState!=null)
         {
             mBundleRecyclerViewState = savedInstanceState.getParcelable("KEY_RECYCLER_STATE");
+
+            mBakeryModelList =Parcels.unwrap(savedInstanceState.getParcelable("DATA"));
+
+            mBakeryAdapter.setBakeryData((ArrayList<BakeryPojo>) mBakeryModelList);
+
+            mLinearLayoutManager.onRestoreInstanceState(mBundleRecyclerViewState);
         }
     }
 
@@ -152,6 +198,8 @@ public class BakingActivity extends AppCompatActivity implements BakeryAdapter.o
         {
             mLinearLayoutManager.onRestoreInstanceState(mBundleRecyclerViewState);
         }
+
+        MyApplication.getInstance().setConnectivityListener(this);
     }
 
     @Override
@@ -188,4 +236,8 @@ public class BakingActivity extends AppCompatActivity implements BakeryAdapter.o
     }
 
 
+    @Override
+    public void onNetworkConnectionChanged(boolean isConnected) {
+        showSnack(isConnected);
+    }
 }
