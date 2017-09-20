@@ -50,7 +50,7 @@ import java.util.List;
 import static com.example.android.udbakery.BakingDetailActivity.mBakeryPojo;
 
 
-public class BakeryVideoFragment extends Fragment implements ExoPlayer.EventListener{
+public class BakeryVideoFragment extends Fragment implements ExoPlayer.EventListener {
 
     private static final String TAG = BakeryVideoFragment.class.getSimpleName();
     private SimpleExoPlayerView mExoPlayerView;
@@ -60,15 +60,13 @@ public class BakeryVideoFragment extends Fragment implements ExoPlayer.EventList
     private TextView mTextView;
     private ImageView mImageView;
 
-    public  BakeryPojo mBakingPojo;
+    public BakeryPojo mBakingPojo;
     private Button nextButton;
     private Button prevButton;
     static Integer mposId;
     static long position;
-    private int mStepId;
-    private String mTitle;
-    private List<BakeryPojo.Steps> steps = new ArrayList<>();
 
+    private List<BakeryPojo.Steps> steps = new ArrayList<>();
     private static Bundle myIntent;
     private Uri videoUri;
 
@@ -103,12 +101,15 @@ public class BakeryVideoFragment extends Fragment implements ExoPlayer.EventList
 
         Configuration configuration = getActivity().getResources().getConfiguration();
 
-        if (configuration.smallestScreenWidthDp >= 700) {
+        if (configuration.smallestScreenWidthDp >= 600) {
             prevButton.setVisibility(View.INVISIBLE);
             nextButton.setVisibility(View.INVISIBLE);
         }
+
         mImageView = v.findViewById(R.id.iv_recipe_image_view);
+
         mExoPlayerView = v.findViewById(R.id.vv_simple);
+
         mTextView = v.findViewById(R.id.textView);
 
         mBakingPojo = Parcels.unwrap(myIntent.getParcelable("BakingPojo"));
@@ -118,80 +119,78 @@ public class BakeryVideoFragment extends Fragment implements ExoPlayer.EventList
         mposId = myIntent.getInt("BakingPosId");
 
         Log.i(TAG, mposId + "");
+        if (savedInstanceState != null) {
+            steps = Parcels.unwrap(savedInstanceState.getParcelable("SELECTED_STEPS"));
+            position = savedInstanceState.getLong("SELECTED_POSITION");
+            mposId = savedInstanceState.getInt("SELECTED_INDEX");
+        }
 
         if (myIntent.getParcelable("BakingPojo") != null) {
 
-            if (savedInstanceState!=null)
-            {
-                steps =Parcels.unwrap(savedInstanceState.getParcelable("SELECTED_STEPS"));
-                position = savedInstanceState.getLong("SELECTED_POSITION");
-                mposId = savedInstanceState.getInt("SELECTED_INDEX");
-            }
-
             if (!TextUtils.isEmpty(steps.get(mposId).getThumbnailURL())) {
-                Picasso.with(getContext()).load(mBakingPojo.getSteps().get(mposId).getThumbnailURL()).into(mImageView);
+                Picasso.with(getContext()).load(steps.get(mposId).getThumbnailURL()).into(mImageView);
             } else {
-                mImageView.setEnabled(false);
 
                 initializeMediaSession();
-
             }
-                if (steps.get(mposId).getVideoURL().isEmpty()) {
+            if (mBakingPojo.getSteps().get(mposId).getVideoURL().isEmpty()) {
 
-                    Bitmap artWork = BitmapFactory.decodeResource(getResources(), R.drawable.default_bakery);
+                Bitmap artWork = BitmapFactory.decodeResource(getResources(), R.drawable.default_bakery);
 
-                    int nh = (int) (artWork.getHeight() * (512.0 / artWork.getWidth()));
+                int nh = (int) (artWork.getHeight() * (512.0 / artWork.getWidth()));
 
-                    Bitmap b = Bitmap.createScaledBitmap(artWork, 512, nh, true);
+                Bitmap b = Bitmap.createScaledBitmap(artWork, 512, nh, true);
 
-                    mExoPlayerView.setDefaultArtwork(b);
+                mExoPlayerView.setDefaultArtwork(b);
 
-                    mExoPlayerView.hideController();
+                mExoPlayerView.hideController();
 
-                    Toast.makeText(getContext(), "No video for this step", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "No video for this step", Toast.LENGTH_SHORT).show();
+            }
+            mTextView.setText(steps.get(mposId).getDescription());
+
+            videoUri = Uri.parse(steps.get(mposId).getVideoURL());
+
+            initializePlayer(videoUri);
+//        }
+
+        if (mposId < steps.size() - 1) {
+            nextButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    Intent nextVideoIntent = new Intent(getContext(), BakingVideosActivity.class);
+                    Parcelable mIdWraper = Parcels.wrap(mBakingPojo);
+                    nextVideoIntent.putExtra("BakingPosId", mposId + 1);
+                    Log.i(TAG, mposId + "");
+                    nextVideoIntent.putExtra("BakingPojo", mIdWraper);
+                    getActivity().finish();
+                    startActivity(nextVideoIntent);
                 }
-                mTextView.setText(steps.get(mposId).getDescription());
+            });
+        } else {
+            nextButton.setEnabled(false);
+        }
+        if (mposId == 0) {
+            prevButton.setEnabled(false);
+        } else {
+            prevButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent prevVideoIntent = new Intent(getContext(), BakingVideosActivity.class);
+                    Parcelable mIdWraper = Parcels.wrap(mBakingPojo);
+                    prevVideoIntent.putExtra("BakingPosId", mposId - 1);
+                    prevVideoIntent.putExtra("BakingPojo", mIdWraper);
+                    getActivity().finish();
+                    startActivity(prevVideoIntent);
+                }
+            });
+        } }
 
-                videoUri = Uri.parse(steps.get(mposId).getVideoURL());
-
-                initializePlayer(videoUri);
-            }
-
-            if (mposId < steps.size() - 1) {
-                nextButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-
-                        Intent nextVideoIntent = new Intent(getContext(), BakingVideosActivity.class);
-                        Parcelable mIdWraper = Parcels.wrap(mBakingPojo);
-                        nextVideoIntent.putExtra("BakingPosId", mposId + 1);
-                        Log.i(TAG, mposId + "");
-                        nextVideoIntent.putExtra("BakingPojo", mIdWraper);
-                        getActivity().finish();
-                        startActivity(nextVideoIntent);
-                    }
-                });
-            } else {
-                nextButton.setEnabled(false);
-            }
-            if (mposId == 0) {
-                prevButton.setEnabled(false);
-            } else {
-                prevButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Intent prevVideoIntent = new Intent(getContext(), BakingVideosActivity.class);
-                        Parcelable mIdWraper = Parcels.wrap(mBakingPojo);
-                        prevVideoIntent.putExtra("BakingPosId", mposId - 1);
-                        prevVideoIntent.putExtra("BakingPojo", mIdWraper);
-                        getActivity().finish();
-                        startActivity(prevVideoIntent);
-                    }
-                });
-            }
-
-        return v;
+          return v;
     }
+
+
 
     private void initializePlayer(Uri mediaUri) {
         if(mExoPlayer == null)

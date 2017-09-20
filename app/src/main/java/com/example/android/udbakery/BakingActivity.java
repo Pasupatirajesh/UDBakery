@@ -2,6 +2,7 @@ package com.example.android.udbakery;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -93,9 +94,10 @@ public class BakingActivity extends AppCompatActivity implements BakeryAdapter.o
                 mLinearLayoutManager = new LinearLayoutManager(getApplicationContext());
                 mRecyclerView.setLayoutManager(mLinearLayoutManager);
                 mRecyclerView.setAdapter(mBakeryAdapter);
+                checkConnection();
             }
 
-            checkConnection();
+
             Gson gson = new GsonBuilder().setLenient().create();
 
 
@@ -132,7 +134,7 @@ public class BakingActivity extends AppCompatActivity implements BakeryAdapter.o
             showSnack(isConnected);
         }
 
-    private void showSnack(boolean isConnected) {
+        private void showSnack(boolean isConnected) {
 
         String message;
         int color;
@@ -159,29 +161,36 @@ public class BakingActivity extends AppCompatActivity implements BakeryAdapter.o
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        mBundleRecyclerViewState = outState;
-        if (mBundleRecyclerViewState == null)
-        {
-            mBundleRecyclerViewState = new Bundle();
-        }
-        mBundleRecyclerViewState = mRecyclerView.getLayoutManager().onSaveInstanceState();
-        outState.putParcelable("KEY_RECYCLER_STATE", mBundleRecyclerViewState);
-        mDoubleWrapper = Parcels.wrap(mBakeryModelList);
-        outState.putParcelable("DATA", mDoubleWrapper);
+
+            mBundleRecyclerViewState = outState;
+            if (mBundleRecyclerViewState == null) {
+                mBundleRecyclerViewState = new Bundle();
+            }
+
+            mBundleRecyclerViewState = mRecyclerView.getLayoutManager().onSaveInstanceState();
+            outState.putParcelable("KEY_RECYCLER_STATE", mBundleRecyclerViewState);
+            mDoubleWrapper = Parcels.wrap(mBakeryModelList);
+            outState.putParcelable("DATA", mDoubleWrapper);
+
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        if(savedInstanceState!=null)
-        {
+        if(savedInstanceState!=null) {
             mBundleRecyclerViewState = savedInstanceState.getParcelable("KEY_RECYCLER_STATE");
 
-            mBakeryModelList =Parcels.unwrap(savedInstanceState.getParcelable("DATA"));
+            mBakeryModelList = Parcels.unwrap(savedInstanceState.getParcelable("DATA"));
 
             mBakeryAdapter.setBakeryData((ArrayList<BakeryPojo>) mBakeryModelList);
+            Configuration configuration = getResources().getConfiguration();
+            if (configuration.smallestScreenWidthDp <= 600) {
+                mLinearLayoutManager.onRestoreInstanceState(mBundleRecyclerViewState);
+            } else {
 
-            mLinearLayoutManager.onRestoreInstanceState(mBundleRecyclerViewState);
+                mGridLayoutManager.onRestoreInstanceState(mBundleRecyclerViewState);
+
+            }
         }
     }
 
@@ -194,11 +203,6 @@ public class BakingActivity extends AppCompatActivity implements BakeryAdapter.o
     @Override
     protected void onResume() {
         super.onResume();
-        if(mBundleRecyclerViewState!=null)
-        {
-            mLinearLayoutManager.onRestoreInstanceState(mBundleRecyclerViewState);
-        }
-
         MyApplication.getInstance().setConnectivityListener(this);
     }
 
